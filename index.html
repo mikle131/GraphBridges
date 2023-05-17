@@ -1,55 +1,63 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>GraphBridges</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <head>
+        <title>GBF</title>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="graph.png" type="image/png">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <link href="style.css" rel="stylesheet">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+    </head>
+    <body>
+        
+        <nav id="main" class="navbar navbar-light bg-light border-light-subtle">
+            <div class="d-flex justify-content-start">
+                <a class="navbar-brand" href="#main">
+                  <img src="graph.png" width="30" height="30" class="d-inline-block align-top" alt="">
+                  GraphBridgesFinder
+                </a>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary" type="button" onclick="location.href='index.html'">Главная</button>
+                <button class="btn btn-outline-secondary ms-2" type="button" onclick="location.href='about.html'">Об алгоритме</button>
+            </div>
+        </nav>
+        <br>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="graph-window">
+                        <div id="graph"></div>
+                        <!-- Поле с графом -->
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <textarea id="edge-input" class="form-control" rows="4" placeholder="Поле ввода списка вершин. Формат: ребро ребро (например: 1 2)"></textarea>
+                    <textarea type="number "id="start-vertex-input" class="form-control" rows="1" placeholder="Поле ввода вершины, с которой начнется обход"></textarea>
+                    <br>
+                    <button id="add-vertex-btn" class="btn btn-warning center-block btn-fix-size">Добавить вершины</button>
+                    <button class="btn btn-success btn-fix-size p-2">Запустить алгоритм</button> 
+                    <button class="btn btn-primary btn-fix-size p-2">Назад</button> 
+                    <button class="btn btn-primary btn-fix-size p-2">Вперед</button>
+                    <div class="text-center">
+                        <br>
+                        <button class="btn btn-danger btn-fix-size-big p-2">Стоп</button>
+                    <hr width="450">
+                    <h4>Текущее состояние</h4>
+                    <table class="table table-grey table-bordered">
+                        <thead>
+                            <tr>
+                              <th scope="col">Вершина</th>
+                              <th scope="col">Соседи(достижимые вершины)</th>
+                            </tr>
+                          </thead>
+                          <tbody id="graph_neighbors">
 
-<div class="w3-top">
-  <div class="w3-bar w3-white w3-wide w3-padding w3-card">
-    <a href="#home" class="w3-bar-item w3-button"><b>CS</b> GraphBridges</a>
-    <div class="w3-right w3-hide-small">
-      <a href="about.html" class="w3-bar-item w3-button">About the algorithm</a>
-    </div>
-  </div>
-</div>
-
-
-
-<table>
-    <tr><th>Заголовок 1</th><th>Заголовок 2</th><th>Заголовок 3</th></tr>
-    <tr><td>Ячейка 2x1 </td><td>Ячейка 2x2 </td><td>Ячейка 2x3 </td></tr>
-  </table>
-
-
-
-<table>
-    <tr><th>Vertex 1</th><th>Vertex 2</th></tr>
-    <tr><td>1 </td><td>2 </td></tr>
-	<tr><td>2 </td><td>4 </td></tr>
-	<tr><td>1 </td><td>4 </td></tr>
-	<tr><td>3</td><td>5 </td></tr>
-	<tr><td>2 </td><td>5 </td></tr>
-	<tr><td>3 </td><td>1 </td></tr>
-	<tr><td>6 </td><td>3 </td></tr>
-	<tr><td>4 </td><td>6 </td></tr>
-  </table>
-  <button type="button">Add new edge</button>
-
-<header class="w3-display-container w3-content w3-wide" style="max-width:1500px;" id="home">
-	<div class="w3-display-middle w3-margin-top w3-center">
- </div>
-</header>
-
-
-
-<footer class="w3-center w3-black w3-padding-16">
-  <p>Powered by <a href="t.me/mikle131">mikle131</a></p>
-</footer>
-
-</body>
+                          </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <script src="script.js"></script>
+    </body>
 </html>
