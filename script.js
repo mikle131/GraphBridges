@@ -49,8 +49,10 @@ function UpdateTable() {
     }
 }
 
+let graph = { nodes: [], links: [] };
+
 function DrawGraph() {
-    let graph = { nodes: [], links: [] };
+    graph = { nodes: [], links: [] };
     for (node in graph_dict) {
         graph.nodes.push({ id: node });
         for (neighbor in graph_dict[node]) {
@@ -68,19 +70,37 @@ function DrawGraph() {
         .force("center", d3.forceCenter(700, 400))
         .force("collide", d3.forceCollide(60));
 
+    var defs = svg.append("defs");
+
+    defs.append("marker")
+        .attr("id", "arrowhead")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 8)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 7)
+        .attr("markerHeight", 7)
+        .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("class", "arrowhead");
+
     var link = svg.selectAll(".link")
-        .data(graph.links)
-        .enter()
-        .append("line")
-        .attr("class", "link")
-        .style("stroke", "black")
-        .style("stroke-width", 2);
+    .data(graph.links)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .style("stroke", "black")
+    .style("stroke-width", 2)
+    .attr("source", function (d) {return d.source})
+    .attr("target", function (d) {return d.target})
+    .attr("marker-end", "url(#arrowhead)");
 
     var node = svg.selectAll(".node")
         .data(graph.nodes)
         .enter()
         .append("g")
-        .attr("class", "node");
+        .attr("class", "node")
+        .attr("id", function (d) { return d.id; });
 
     node.append("circle")
         .attr("r", 12)
@@ -101,30 +121,94 @@ function DrawGraph() {
 
     function ticked() {
         link.transition()
-            .duration(20)
-            .attr("x1", function (d) { return d.source.x; })
-            .attr("y1", function (d) { return d.source.y; })
-            .attr("x2", function (d) { return d.target.x; })
-            .attr("y2", function (d) { return d.target.y; });
-
+        .duration(20)
+        .attr("x1", function (d) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var length = Math.sqrt(dx * dx + dy * dy);
+            var offsetX = (dx / length) * 12;
+            var offsetY = (dy / length) * 12;
+            return d.source.x + offsetX;
+        })
+        .attr("y1", function (d) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var length = Math.sqrt(dx * dx + dy * dy);
+            var offsetX = (dx / length) * 12;
+            var offsetY = (dy / length) * 12;
+            return d.source.y + offsetY;
+        })
+        .attr("x2", function (d) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var length = Math.sqrt(dx * dx + dy * dy);
+            var offsetX = (dx / length) * 12;
+            var offsetY = (dy / length) * 12;
+            return d.target.x - offsetX;
+        })
+        .attr("y2", function (d) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var length = Math.sqrt(dx * dx + dy * dy);
+            var offsetX = (dx / length) * 12;
+            var offsetY = (dy / length) * 12;
+            return d.target.y - offsetY;
+        });
+    
         node.transition()
             .duration(20)
             .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
     }
 }
-
-function SetOrientation(a, b) {
-    var edge = graph.links.find(function(link) {
-      return link.source.id === a && link.target.id === b;
-    });  
-    if (edge) {
-      edge.oriented = true;
-    }  
-    svg.select(".link[source='" + a + "'][target='" + b + "']")
-      .attr("marker-end", function(d) {
-        return d.oriented ? "url(#arrowhead)" : null;
-      });
+//удаление ребра, идущего из a в b
+function DeleteEdge(a, b) {
+    var svg = d3.select("svg");
+    let edge = svg.select(".link[source='"+b+"'][target='"+a+"']");
+    if (!edge) {
+        alert("Ребро не найдено");
+        return;
+    }
+    edge.remove();
   }
+  
+// Раскраска вершины с номером num
+function ColorVertex(num) {
+    var svg = d3.select("svg");
+    if (!vertex) {
+        alert("Вершина не найдена");
+        return;
+    }
+    let node = svg.select(".node[id='"+num+"']");
+    node.select("circle")
+        .style("fill", "red");
 
-let addVertexBtn = document.getElementById("add-vertex-btn");
-addVertexBtn.addEventListener("click", UpdateGraph);
+}
+
+let step_alg_num = 0;
+function RunAlgrotihm() {
+    let num = document.getElementById("start-input").value;
+    if (!isNumeric(num) || num.length == 0) {
+        alert("Стартовая вершина задана неверно");
+        return;
+    }
+    if (step_alg_num != 0) {
+        alert("Алгоритм уже запущен");
+        return;
+    }
+    step_alg_num = 1;
+    ColorVertex(num);
+    DeleteEdge(1, 2);
+}
+
+function reloadPage() {
+    document.location.reload()
+}
+
+let add_vertex_button = document.getElementById("add-vertex-btn");
+add_vertex_button.addEventListener("click", UpdateGraph);
+
+let run_algorithm_button = document.getElementById("run-algorighm-btn");
+run_algorithm_button.addEventListener("click", RunAlgrotihm);
+
+let reload_button = document.getElementById("reload-page");
+reload_button.addEventListener("click", reloadPage);

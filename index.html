@@ -33,17 +33,20 @@
                 </div>
                 <div class="col-md-3">
                     <textarea id="edge-input" class="form-control" rows="4" placeholder="Поле ввода списка вершин. Формат: ребро ребро (например: 1 2)"></textarea>
-                    <textarea type="number "id="start-vertex-input" class="form-control" rows="1" placeholder="Поле ввода вершины, с которой начнется обход"></textarea>
+                    <textarea id="start-input"type="number "id="start-vertex-input" class="form-control" rows="1" placeholder="Поле ввода вершины, с которой начнется обход"></textarea>
                     <br>
-                    <button id="add-vertex-btn" class="btn btn-warning center-block btn-fix-size">Добавить вершины</button>
-                    <button class="btn btn-success btn-fix-size p-2">Запустить алгоритм</button> 
-                    <button class="btn btn-primary btn-fix-size p-2">Назад</button> 
-                    <button class="btn btn-primary btn-fix-size p-2">Вперед</button>
+                    <button id="add-vertex-btn" class="btn btn-warning center-block btn-fix-size-big">Добавить вершины</button>
+                    <button id="run-algorighm-btn" class="btn btn-success btn-fix-size-big p-2">Запустить алгоритм</button>
                     <div class="text-center">
                         <br>
-                        <button class="btn btn-danger btn-fix-size-big p-2">Стоп</button>
+                        <button id="reload-page" class="btn btn-danger btn-fix-size p-2">Сброс</button>
+                        <button class="btn btn-primary btn-fix-size p-2">Вперед</button>
+                        <button class="btn btn-primary btn-fix-size p-2">Следующий этап</button>
                     <hr width="450">
                     <h4>Текущее состояние</h4>
+                    <p>Этап алгоритма: </p>
+                    <p>Обход: </p>
+                    <hr width="450">
                     <table class="table table-grey table-bordered">
                         <thead>
                             <tr>
