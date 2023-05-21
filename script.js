@@ -34,8 +34,12 @@ function UpdateGraph() {
     DrawGraph();
 }
 
+description = ["Ввод данных", "Поиск в глубину с обратным ориентирванием ребер", "Разворот списка", "Раскраска"];
+
 function UpdateTable() {
     let table = document.getElementById("graph_neighbors");
+    document.getElementById("alg-step").textContent = "Этап алгоритма: " + step_alg_num + ' (' + description[step_alg_num]+')';
+    document.getElementById("obhod").textContent = "Обход: "+order_out;
     let row_count = table.rows.length;
     for (let i = 0; i < row_count; i++) {
         table.deleteRow(0);
@@ -68,7 +72,7 @@ function DrawGraph() {
         .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(150))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(700, 400))
-        .force("collide", d3.forceCollide(60));
+        .force("collide", d3.forceCollide(100)); //отталкивание
 
     var defs = svg.append("defs");
 
@@ -172,7 +176,7 @@ function DeleteEdge(a, b) {
   }
   
 // Раскраска вершины с номером num
-function ColorVertex(num) {
+function ColorVertex(num, color) {
     var svg = d3.select("svg");
     if (!vertex) {
         alert("Вершина не найдена");
@@ -180,9 +184,10 @@ function ColorVertex(num) {
     }
     let node = svg.select(".node[id='"+num+"']");
     node.select("circle")
-        .style("fill", "red");
+        .style("fill", color);
 
 }
+
 
 let step_alg_num = 0;
 function RunAlgrotihm() {
@@ -196,13 +201,141 @@ function RunAlgrotihm() {
         return;
     }
     step_alg_num = 1;
-    ColorVertex(num);
-    DeleteEdge(1, 2);
+    ColorVertex(num, "blue");
+    UpdateTable();
+    for (i in graph_dict) {
+        if (i != num) {
+            to_run_step_1.push(i);
+        }
+    }
+    to_run_step_1.push(num);
 }
 
 function reloadPage() {
     document.location.reload()
 }
+
+//Окей, сам алгоритм. Сначала добвим, как надо реагировать при нажатии на кнопку "Вперед"
+
+function GoNext () {
+    if (step_alg_num == 0) {
+        alert("Сначала запустите алгоритм");
+    }
+    else if (step_alg_num == 1) {
+        go_next_1();
+    }
+    else if (step_alg_num == 2) {
+         go_next_2();
+     }
+    else if (step_alg_num == 3) {
+        go_next_3();
+    }
+    else {
+        alert("Алгоритм закончен");
+    }
+}
+
+
+let to_run_step_1 = [];
+let visited = [];
+let order_out = [];
+let previous = 0;
+
+function go_next_1 () {
+    let now = to_run_step_1[to_run_step_1.length - 1];
+    visited.push(now);
+    let was_new = 0;
+    let ind_new = 0;
+    ColorVertex(previous, "red");
+    for (let i = 0; i < graph_dict[now].length; i++) {
+        let neighbor = graph_dict[now][i];
+        if (!visited.includes(neighbor)) {
+            to_run_step_1.push(neighbor);
+            was_new = 1;
+            ind_new = i;
+            break;
+        }
+    }
+    if (was_new) {
+        let next = to_run_step_1[to_run_step_1.length - 1];
+        let ind = graph_dict[now].indexOf(next);
+        graph_dict[now].splice(ind, 1);
+        DeleteEdge(next, now);
+        UpdateTable();
+    }
+    else {
+        if (!(order_out.includes(to_run_step_1[to_run_step_1.length - 1]))) {
+            order_out.push(to_run_step_1[to_run_step_1.length - 1]); //Куча вершинок для несвязного графа
+        }
+        to_run_step_1.pop();
+        UpdateTable();
+    }
+    ColorVertex(now, "red");
+    ColorVertex(to_run_step_1[to_run_step_1.length - 1], "blue");
+    previous = now;
+    if (to_run_step_1.length == 0) {
+        step_alg_num = 2;
+        UpdateTable();
+    }
+}
+
+function go_next_2 () {
+    order_out.reverse();
+    step_alg_num = 3;
+    UpdateTable();
+}
+
+//order_out
+
+let q = 0;
+let order = [];
+let color_dict = {};
+let curr_color = 1;
+let colors = ['', "gold", "blue", "green", "black", "grey", "darkgreen", "pink", "brown", "slateblue", "grey1", "orange"];
+let visited_3 = [];
+
+function go_next_3 () {
+    if (order.length == 0) {
+        if (q == order_out.length) {
+            step_alg_num = 4;
+            UpdateTable();
+            return;
+        }
+        if (!(visited_3.includes(order_out[q]))) {
+            order.push(order_out[q]);
+            q+= 1;
+            curr_color += 1;
+        }
+        else {
+            q += 1;
+        }
+
+    }
+    let now = order[order.length - 1];
+    let was_neighbor = 0;
+    ColorVertex(now, colors[curr_color]);
+    alert("Ордер: "+order);
+    alert("Соседи: "+ graph_dict[now]);
+    for (let neighbor3 in graph_dict[now]) {
+        if (neighbor3 != 0){
+            alert(neighbor3);
+            color_dict[neighbor3] = curr_color;
+            ColorVertex(neighbor3, colors[curr_color]);
+            order.push(neighbor3);
+            visited_3.push(neighbor3);
+            was_neighbor = 1;
+            break;
+        }
+    }
+    if (!was_neighbor) {
+        order.pop();
+    }
+}
+
+
+
+let go_next_btn = document.getElementById("go-next-btn");
+go_next_btn.addEventListener("click", GoNext);
 
 let add_vertex_button = document.getElementById("add-vertex-btn");
 add_vertex_button.addEventListener("click", UpdateGraph);
