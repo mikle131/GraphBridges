@@ -5,6 +5,10 @@ let graph_dict = {};
 let edge_list = [];
 
 function UpdateGraph() {
+    if (step_alg_num != 0) {
+        alert("Алгоритм уже запущен. Вы не можете добавлять ребра в процессе работы алгоритма");
+        return;
+    }
     let data = document.getElementById("edge-input").value;
     let massive_of_edges = data.split("\n");
     document.getElementById("edge-input").value = '';
@@ -74,7 +78,7 @@ function DrawGraph() {
         .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(150))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(700, 400))
-        .force("collide", d3.forceCollide(100)); //отталкивание
+        .force("collide", d3.forceCollide(50)); //отталкивание
 
     var defs = svg.append("defs");
 
@@ -324,6 +328,7 @@ function go_next_3 () {
             step_alg_num = 4;
             UpdateTable();
             CurEdge(edge_list[0][0], edge_list[0][1]);
+            document.getElementById("on-checking").textContent = "На проверке ребро "+edge_list[0][0]+"-"+edge_list[0][1];
             return;
         }
         if (!visited_3.includes(order_out[q])) {
@@ -356,26 +361,33 @@ function go_next_3 () {
 }
 
 let edge_num = 1;
+let found_bridges = [];
 
 function go_next_4 () {
     if (edge_num == edge_list.length + 1) {
         step_alg_num = 5;
+        document.getElementById("on-checking").textContent = "Статус: Алгоритм закончен";
         return;
     }
     let edge_i = edge_list[edge_num - 1];
     if (color_dict[edge_i[0]] != color_dict[edge_i[1]]) {
-        alert("Ребро "+edge_i[0]+"-"+edge_i[1]+" - мост");
         ColorEdge(edge_i[0], edge_i[1], "red");
+        found_bridges.push(" "+edge_i[0]+"-"+edge_i[1]);
     }
     else {
-        alert("Ребро "+edge_i[0]+"-"+edge_i[1]+" - НЕ мост");
         ColorEdge(edge_i[0], edge_i[1], "black");
     }
     UpdateTable();
     if (edge_num < edge_list.length) {
         let edge_next = edge_list[edge_num];
         CurEdge(edge_next[0], edge_next[1]);
+        document.getElementById("on-checking").textContent = "На проверке ребро "+edge_next[0]+"-"+edge_next[1];
     }
+    else {
+        document.getElementById("on-checking").textContent = "Статус: Алгоритм закончен";
+    }
+    let print_bridges = document.getElementById("found-bridges");
+    print_bridges.textContent = "Найденные мосты: "+found_bridges;
     edge_num += 1;
 }
 
