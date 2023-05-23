@@ -2,13 +2,15 @@ const isNumeric = n => !isNaN(n);
 
 let graph_dict = {};
 
+let edge_list = [];
+
 function UpdateGraph() {
     let data = document.getElementById("edge-input").value;
     let massive_of_edges = data.split("\n");
     document.getElementById("edge-input").value = '';
     for (let i = 0; i < massive_of_edges.length; i++) {
         let edge = massive_of_edges[i].split(" ");
-
+        edge_list.push(edge);
         if (!isNumeric(edge[0]) || !isNumeric(edge[1])) {
             alert("Вершины могут быть представлены лишь числами. Ребро "+massive_of_edges[i]+" не добавлено.");
             continue;
@@ -34,7 +36,7 @@ function UpdateGraph() {
     DrawGraph();
 }
 
-description = ["Ввод данных", "Поиск в глубину с обратным ориентирванием ребер", "Разворот списка", "Раскраска"];
+description = ["Ввод данных", "Поиск в глубину с обратным ориентирванием ребер", "Разворот списка", "Раскраска", "Поиск мостов  проходом по ребрам и сравниванием цветов"];
 
 function UpdateTable() {
     let table = document.getElementById("graph_neighbors");
@@ -174,6 +176,24 @@ function DeleteEdge(a, b) {
     }
     edge.remove();
   }
+
+  function ColorEdge(a, b, color) {
+    var svg = d3.select("svg");
+    let edge = svg.select(".link[source='"+b+"'][target='"+a+"']");
+    edge.style("stroke", color);
+    edge.style("stroke-width", "2");
+    let edge2 = svg.select(".link[source='"+a+"'][target='"+b+"']");
+    edge2.style("stroke", color);
+    edge2.style("stroke-width", "2");
+  }
+  
+  function CurEdge(a, b) {
+    var svg = d3.select("svg");
+    let edge = svg.select(".link[source='"+b+"'][target='"+a+"']");
+    edge.style("stroke-width", "4");
+    let edge2 = svg.select(".link[source='"+a+"'][target='"+b+"']");
+    edge2.style("stroke-width", "4");
+  }
   
 // Раскраска вершины с номером num
 function ColorVertex(num, color) {
@@ -229,6 +249,9 @@ function GoNext () {
      }
     else if (step_alg_num == 3) {
         go_next_3();
+    }
+    else if (step_alg_num == 4){
+        go_next_4();
     }
     else {
         alert("Алгоритм закончен");
@@ -290,49 +313,86 @@ function go_next_2 () {
 let q = 0;
 let order = [];
 let color_dict = {};
-let curr_color = 1;
+let curr_color = 0;
 let colors = ['', "gold", "blue", "green", "black", "grey", "darkgreen", "pink", "brown", "slateblue", "grey1", "orange"];
 let visited_3 = [];
+let prev = 0;
 
 function go_next_3 () {
     if (order.length == 0) {
         if (q == order_out.length) {
             step_alg_num = 4;
             UpdateTable();
+            CurEdge(edge_list[0][0], edge_list[0][1]);
             return;
         }
-        if (!(visited_3.includes(order_out[q]))) {
+        if (!visited_3.includes(order_out[q])) {
             order.push(order_out[q]);
-            q+= 1;
             curr_color += 1;
         }
-        else {
-            q += 1;
-        }
-
+        q += 1;
     }
     let now = order[order.length - 1];
-    let was_neighbor = 0;
     ColorVertex(now, colors[curr_color]);
-    alert("Ордер: "+order);
-    alert("Соседи: "+ graph_dict[now]);
-    for (let neighbor3 in graph_dict[now]) {
-        if (neighbor3 != 0){
-            alert(neighbor3);
-            color_dict[neighbor3] = curr_color;
-            ColorVertex(neighbor3, colors[curr_color]);
-            order.push(neighbor3);
-            visited_3.push(neighbor3);
+    color_dict[now] = curr_color;
+    if (!(visited_3.includes(now))) {
+        visited_3.push(now);
+    }
+    let was_neighbor = 0;
+    for (let i = 0; i < graph_dict[now].length; i++) {
+        let neigh = graph_dict[now][i];
+        if (!(visited_3.includes(neigh))) {
+            order.push(neigh);
             was_neighbor = 1;
             break;
         }
     }
-    if (!was_neighbor) {
+    if (was_neighbor == 0) {
         order.pop();
+        if (order.length != 0) {
+            go_next_3();
+        }
     }
 }
 
+let edge_num = 1;
 
+function go_next_4 () {
+    if (edge_num == edge_list.length + 1) {
+        step_alg_num = 5;
+        return;
+    }
+    let edge_i = edge_list[edge_num - 1];
+    if (color_dict[edge_i[0]] != color_dict[edge_i[1]]) {
+        alert("Ребро "+edge_i[0]+"-"+edge_i[1]+" - мост");
+        ColorEdge(edge_i[0], edge_i[1], "red");
+    }
+    else {
+        alert("Ребро "+edge_i[0]+"-"+edge_i[1]+" - НЕ мост");
+        ColorEdge(edge_i[0], edge_i[1], "black");
+    }
+    UpdateTable();
+    if (edge_num < edge_list.length) {
+        let edge_next = edge_list[edge_num];
+        CurEdge(edge_next[0], edge_next[1]);
+    }
+    edge_num += 1;
+}
+
+function NextStep () {
+    if (step_alg_num == 5) {
+        alert("Алгоритм закончен");
+    }
+    else if (step_alg_num == 0) {
+        alert("Сначала запустите алгоритм");
+    }
+    else {
+        let next = step_alg_num + 1;
+        while (step_alg_num != next) {
+            GoNext();
+        }
+    }
+}
 
 let go_next_btn = document.getElementById("go-next-btn");
 go_next_btn.addEventListener("click", GoNext);
@@ -345,3 +405,6 @@ run_algorithm_button.addEventListener("click", RunAlgrotihm);
 
 let reload_button = document.getElementById("reload-page");
 reload_button.addEventListener("click", reloadPage);
+
+let next_step_button = document.getElementById("go-next-step-btn");
+next_step_button.addEventListener("click", NextStep);
