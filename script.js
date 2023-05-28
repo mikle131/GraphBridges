@@ -40,12 +40,13 @@ function UpdateGraph() {
     DrawGraph();
 }
 
-description = ["Ввод данных", "Поиск в глубину с обратным ориентирванием ребер", "Разворот списка", "Раскраска", "Поиск мостов  проходом по ребрам и сравниванием цветов"];
-
+description = ["Ввод данных", "Поиск в глубину с обратным ориентирванием ребер", "Разворот списка", "Раскраска", "Поиск мостов  проходом по ребрам и сравниванием цветов", "Алгортим завершен"];
+description_long = ['Ввод данных.', 'Поиск в глубину с обратным ориентирванием ребер. То есть при прохождении по ребру (v. u) (то есть когда мы находимся в вершине v, а вершина u еще не посещена) мы превращаем это ребро в ориентиронное в обратную сторону. В итоге могут остаться ребра, по которым обход в глубину вообще не проходил. Они останутся неориентированными. Также при выходе из DFS запоминаем в отдельный массив номера вершин.', 'Разворачиваем полученный массив.', 'Далее мы идем циклом по нашемк списку и, если вершина не помечена как посещенная, запускаем функцию обхода в глубину, которая работает на ориентированном графе. Она просто красит все достижимые вершины в цвет очередной компоненты.', 'Далее проходимся по всем ребрам. Те ребра, которые соединяют вершины, покрашенные в разный цвет, являются мостами.', 'Алгоритм закончен']
 function UpdateTable() {
     let table = document.getElementById("graph_neighbors");
     document.getElementById("alg-step").textContent = "Этап алгоритма: " + step_alg_num + ' (' + description[step_alg_num]+')';
     document.getElementById("obhod").textContent = "Обход: "+order_out;
+    document.getElementById("step-description").textContent = "Описание этапа: "+ description_long[step_alg_num];
     let row_count = table.rows.length;
     for (let i = 0; i < row_count; i++) {
         table.deleteRow(0);
@@ -78,7 +79,7 @@ function DrawGraph() {
         .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(150))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(700, 400))
-        .force("collide", d3.forceCollide(50)); //отталкивание
+        .force("collide", d3.forceCollide(50));
 
     var defs = svg.append("defs");
 
@@ -260,6 +261,7 @@ function GoNext () {
     else {
         alert("Алгоритм закончен");
     }
+    UpdateTable()
 }
 
 
