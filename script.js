@@ -407,6 +407,31 @@ function NextStep () {
         }
     }
 }
+let p1 = '1 2\n3 4\n5 6\n6 7\n7 8\n8 6\n8 2'
+let p2 = '1 2\n2 4\n4 5\n4 3\n3 1'
+let p3 = '1 2\n2 3\n3 1\n4 5\n1 5\n3 5\n4 6\n4 7'
+let p4 = '1 2\n1 3\n1 4\n2 3\n2 4\n3 4\n3 2\n6 3\n6 1\n6 7'
+
+function fill1 () {
+    document.getElementById("edge-input").textContent = p1
+    document.getElementById("start-input").textContent = '1'
+}
+
+
+function fill2 () {
+    document.getElementById("edge-input").textContent = p2
+    document.getElementById("start-input").textContent = '3'
+}
+
+function fill3 () {
+    document.getElementById("edge-input").textContent = p3
+    document.getElementById("start-input").textContent = '5'
+}
+
+function fill4 () {
+    document.getElementById("edge-input").textContent = p4
+    document.getElementById("start-input").textContent = '4'
+}
 
 let go_next_btn = document.getElementById("go-next-btn");
 go_next_btn.addEventListener("click", GoNext);
@@ -422,3 +447,15 @@ reload_button.addEventListener("click", reloadPage);
 
 let next_step_button = document.getElementById("go-next-step-btn");
 next_step_button.addEventListener("click", NextStep);
+
+let ex1 = document.getElementById("ex-1");
+ex1.addEventListener("click", fill1);
+
+let ex2 = document.getElementById("ex-2");
+ex2.addEventListener("click", fill2);
+
+let ex3 = document.getElementById("ex-3");
+ex3.addEventListener("click", fill3);
+
+let ex4 = document.getElementById("ex-4");
+ex4.addEventListener("click", fill4);
