@@ -79,7 +79,7 @@ function DrawGraph() {
         .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(150))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(700, 400))
-        .force("collide", d3.forceCollide(50));
+        .force("collide", d3.forceCollide(75));
 
     var defs = svg.append("defs");
 
@@ -338,6 +338,8 @@ function go_next_3 () {
             curr_color += 1;
         }
         q += 1;
+        go_next_3();
+        return;
     }
     let now = order[order.length - 1];
     ColorVertex(now, colors[curr_color]);
