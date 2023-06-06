@@ -4,6 +4,8 @@ let graph_dict = {};
 
 let edge_list = [];
 
+let vertex_list = [];
+
 function UpdateGraph() {
     if (step_alg_num != 0) {
         alert("Алгоритм уже запущен. Вы не можете добавлять ребра в процессе работы алгоритма");
@@ -22,7 +24,8 @@ function UpdateGraph() {
 
         let vertex1 = edge[0];
         let vertex2 = edge[1];
-
+        vertex_list.push(vertex1);
+        vertex_list.push(vertex2);
         if (vertex1 == vertex2) {
             continue;
         }
@@ -266,19 +269,27 @@ function GoNext () {
 
 
 let to_run_step_1 = [];
-let visited = [];
+let visited = {};
+order_out_check_incl = {};
 let order_out = [];
 let previous = 0;
-
+let is_first = 1;
 function go_next_1 () {
+    if (is_first == 1) {
+        for (let m = 0; m < vertex_list.length; m++) {
+            visited[vertex_list[m]] = 0;
+            order_out_check_incl[vertex_list[m]] = 0;
+        }
+        is_first = 0;
+    }
     let now = to_run_step_1[to_run_step_1.length - 1];
-    visited.push(now);
+    visited[now] = 1;
     let was_new = 0;
     let ind_new = 0;
     ColorVertex(previous, "red");
     for (let i = 0; i < graph_dict[now].length; i++) {
         let neighbor = graph_dict[now][i];
-        if (!visited.includes(neighbor)) {
+        if (visited[neighbor] == 0) {
             to_run_step_1.push(neighbor);
             was_new = 1;
             ind_new = i;
@@ -293,7 +304,8 @@ function go_next_1 () {
         UpdateTable();
     }
     else {
-        if (!(order_out.includes(to_run_step_1[to_run_step_1.length - 1]))) {
+        if (order_out_check_incl[to_run_step_1[to_run_step_1.length - 1]] == 0) {
+            order_out_check_incl[to_run_step_1[to_run_step_1.length - 1]] = 1;
             order_out.push(to_run_step_1[to_run_step_1.length - 1]); //Куча вершинок для несвязного графа
         }
         to_run_step_1.pop();
@@ -321,10 +333,17 @@ let order = [];
 let color_dict = {};
 let curr_color = 0;
 let colors = ['', "gold", "blue", "green", "black", "grey", "darkgreen", "pink", "brown", "slateblue", "grey1", "orange"];
-let visited_3 = [];
+let visited_3 = {};
 let prev = 0;
+let is_first_3 = 1;
 
 function go_next_3 () {
+    if (is_first_3 == 1) {
+        for (let j = 0; j < vertex_list.length; j++) {
+            visited_3[vertex_list[j]] = 0;
+        }
+        is_first_3 = 0;
+    }
     if (order.length == 0) {
         if (q == order_out.length) {
             step_alg_num = 4;
@@ -333,7 +352,7 @@ function go_next_3 () {
             document.getElementById("on-checking").textContent = "На проверке ребро "+edge_list[0][0]+"-"+edge_list[0][1];
             return;
         }
-        if (!visited_3.includes(order_out[q])) {
+        if (visited_3[order_out[q]] == 0) {
             order.push(order_out[q]);
             curr_color += 1;
         }
@@ -344,13 +363,13 @@ function go_next_3 () {
     let now = order[order.length - 1];
     ColorVertex(now, colors[curr_color]);
     color_dict[now] = curr_color;
-    if (!(visited_3.includes(now))) {
-        visited_3.push(now);
+    if (visited_3[now] == 0) {
+        visited_3[now] = 1;
     }
     let was_neighbor = 0;
     for (let i = 0; i < graph_dict[now].length; i++) {
         let neigh = graph_dict[now][i];
-        if (!(visited_3.includes(neigh))) {
+        if (visited_3[neigh] == 0) {
             order.push(neigh);
             was_neighbor = 1;
             break;
